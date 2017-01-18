@@ -78,6 +78,8 @@
                 
                 const OPER_REJ_PROD = 308;
                 
+                const OPER_SHOW_PRODS_BY_STATE = 309;
+                
                 const OPER_SYNC_PRODUCTS = 310;
 		
 		

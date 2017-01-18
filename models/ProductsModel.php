@@ -165,7 +165,7 @@
 				array_push($products, $value);
 				$quantity--;
 				if($quantity <= 0)
-                                    break;
+                                  break;;
                             }
                             return $products;
 			}
@@ -178,8 +178,41 @@
                         throw new ApiException(WSConstants::STATE_DB_ERROR, $ex->getMessage());
                     }
                 }
+                public static function getByState($class, $quantity)
+                {
+                        $command = "SELECT products.name as name, products.price AS price, products.description AS desciption, stores.name AS store, products.idproducts AS idproducts, products.image AS image, products.publishdate AS publishdate
+                                    FROM products INNER JOIN stores ON stores.idstores = products.idstore INNER JOIN types ON products.idtype = types.idtype 
+                                    WHERE `show` = ?";
+                       
+                        $statement = DBConnection::getInstance()->obtaindb()->prepare($command);
+                        $statement->bindParam(1, $class);
+                        
+                        if($statement->execute())
+                        {
+                            $products = array();
+                            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+                            $products = array();
+                            
+                            foreach ($result as $value)
+                            {    
+                                array_push($products, $value);
+                                $quantity--;
+                                if($quantity<=0)
+                                    break;
+                                
+                                        
+                            }
+                            return $products;
+                                    
+                        }
+                        else
+                        {
+                            throw new ApiException(WSConstants::STATE_UNKNOW_FAILURE, "Se produjo un error desconocido");
+                        }
+                       
+                } 
 
-		public static function create($data)
+                public static function create($data)
 		{
 
 			try

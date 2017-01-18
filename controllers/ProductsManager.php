@@ -13,7 +13,7 @@
 		
 		public function process($operation, $data)
 		{
-                        if($operation >= WSConstants::OPER_SHOW_PRODS_PARAM && $operation <= WSConstants::OPER_REJ_PROD)
+                        if($operation >= WSConstants::OPER_SHOW_PRODS_PARAM && $operation <= WSConstants::OPER_SHOW_PRODS_BY_STATE)
                         {
                             switch ($operation)
                             {
@@ -23,6 +23,8 @@
                                     return $this->alterProd($data->idproducts, $data->state);
                                 case WSConstants::OPER_REJ_PROD:
                                     return $this->alterProd($data->idproducts, $data->state);
+                                case WSConstants::OPER_SHOW_PRODS_BY_STATE:
+                                    return $this->showProductsByState($data->state);
                             }
                         }
 			$userID = AccessManager::authorize();
@@ -167,7 +169,23 @@
 				throw new ApiException(WSConstants::OPER_SHOW_RND_PRODUCTS, utf8_encode("No se encontraron tiendas..."));
 			}
 		}
+                private function showProductsByState($data)
+                {
+                    $products = ProductsModel::getByState($data, 30);
+                    $list = array();
+                    
+                    if(empty($products))
+			{
+				throw new ApiException(WSConstants::OPER_SHOW_PRODS_BY_STATE, utf8_encode("No se encontraron productos..."));
+			}
+                    else
+                    {
+                        return [WSConstants::FIELD_STATE=>000, WSConstants::FIELD_DATA=>$products];
+                    }
+                    
                 
+                }
+
                 private function alterProd($idproducts, $newstate)
                 {
                     $result = ProductsModel::updateState($idproducts, $newstate);
