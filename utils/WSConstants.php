@@ -47,6 +47,8 @@
         const OPER_REFRESH_SESSION = 102;
                 
         const OPER_UPDATE_USER = 103;
+        
+        const OPER_VALIDATE_USER = 104;
 
         const OPER_SHOW_FRIENDS = 200;
 

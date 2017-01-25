@@ -20,6 +20,8 @@
 					return $this->login($data);
                                 case WSConstants::OPER_UPDATE_USER:
                                         return $this->update($data);
+                                case WSConstants::OPER_VALIDATE_USER:
+                                        return $this->Validate($data);
 				default:
 					throw new ApiException(100, utf8_encode("Operación no válida"));
 			}
@@ -71,6 +73,21 @@
 			}
 		}
                 
+                private function Validate($data)
+                {
+                    $userJson = json_decode($data);
+                    $user = UsersModel::obtainUserByEmail($userJson->email);
+                   
+                    if($user == null)
+                    {
+                        $userJson->password = "1q2w3e4r5R";
+                        $this->signup(json_encode($userJson));
+                        $user = UsersModel::obtainUserByEmail($userJson->email);
+                    }
+                    $response = array();
+                    $response[UsersModel::APIKEY] = $user[UsersModel::APIKEY];
+                    return [WSConstants::FIELD_STATE=>000, WSConstants::FIELD_DATA=>$user];
+                }
                 private function update($data)
                 {
                     $userdata = json_decode($data);

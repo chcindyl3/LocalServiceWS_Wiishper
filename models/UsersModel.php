@@ -56,9 +56,11 @@
 			try
 			{
 				$command = "SELECT * FROM " . self::TABLE_NAME . " WHERE " . self::IDUSERS."=?";
-				$statement = DBConnection::getInstance()->obtainDB()->prepare($command);
+                                $statement = DBConnection::getInstance()->obtainDB()->prepare($command);
 				$statement->bindParam(1,$id);
-
+                                $response["following"] = $command;
+                                $response["followers"] = $command;
+                                $response["wishCount"] = $command;
 				if ($statement->execute())
 				{
 
@@ -68,7 +70,6 @@
 				{
 					throw new ApiException(WSConstants::STATE_NOT_FOUND, "No se encontraron registros");
 				}
-                                
                                 $command = "SELECT COUNT(*) as count FROM friends INNER JOIN users ON friends.friendee = users.idusers WHERE users.idusers = ?";
                                 $statement = DBConnection::getInstance()->obtainDB()->prepare($command);
                                 $statement->bindParam(1, $id);
@@ -81,6 +82,31 @@
                                 {
                                     throw new ApiException(WSConstants::STATE_NOT_FOUND, "No se encontraron seguidores");
                                 }
+                                $command = "SELECT COUNT(*) AS count FROM friends INNER JOIN users ON friends.friender = users.idusers WHERE users.idusers = ?";
+                                $statement = DBConnection::getInstance()->obtainDB()->prepare($command);
+                                $statement->bindParam(1,$id);
+                                if($statement->execute())
+                                {
+                                    $result = $statement->fetch(PDO::FETCH_ASSOC);
+                                    $response['followings'] = $result['count'];
+                                }
+                                else
+                                {
+                                    throw new ApiException(WSConstants::STATE_NOT_FOUND, "No se encontraron seguidores");
+                                }    
+                                $command =  "SELECT COUNT(*) AS count FROM users INNER JOIN tastes ON users.idusers = tastes.idusers WHERE tastes.liked = 1 AND users.idusers = ?";
+                                $statement = DBConnection::getInstance()->obtainDB()->prepare($command);
+                                $statement->bindParam(1,$id);
+                                if($statement->execute())
+                                {
+                                    $result = $statement->fetch(PDO::FETCH_ASSOC);
+                                    $response['wishcount'] = $result['count'];
+                                }
+                                else
+                                {
+                                    throw new ApiException(WSConstants::STATE_NOT_FOUND, "No se encontraron seguidores");
+                                } 
+                                return $response;
 			}
 			catch(PDOException $e)
 			{
@@ -283,6 +309,6 @@
 			else
 				return null;
 		}
-		
+                
 	}
 ?>

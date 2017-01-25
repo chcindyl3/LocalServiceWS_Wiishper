@@ -206,6 +206,7 @@
 					{
                                             $user = UsersModel::get($value[UsersModel::IDUSERS]);
                                             $user['isfriend'] = false;
+                                            
 						array_push($friends, $user);
 					}
 					
